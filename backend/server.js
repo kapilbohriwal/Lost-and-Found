@@ -13,7 +13,7 @@ connectDB();
 // ── Middleware ─────────────────────────────────────────────
 app.use(cors({
   origin: [
-    'http://localhost:5000',
+    'https://lost-and-found-production-9b86.up.railway.app',
     'http://127.0.0.1:5000',
     'http://localhost:5500',
     'http://127.0.0.1:5500',

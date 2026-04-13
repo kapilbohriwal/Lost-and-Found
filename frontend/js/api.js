@@ -1,5 +1,5 @@
 /* ── Config ─────────────────────────────────────────────── */
-const API = 'http://localhost:5000/api';
+const API = 'https://lost-and-found-production-9b86.up.railway.app/api';
 
 /* ── Auth helpers ───────────────────────────────────────── */
 const getToken = ()      => localStorage.getItem('lf_token');
