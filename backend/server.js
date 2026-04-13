@@ -15,13 +15,12 @@ const cors = require('cors');
 
 app.use(cors({
   origin: [
+    'https://lost-and-found-ten-sooty.vercel.app', // ✅ NEW (IMPORTANT)
     'https://lost-and-found-b77udru8o-kapilbohriwals-projects.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
-
-// ✅ VERY IMPORTANT (fixes your error)
 app.options('*', cors());
 
 
