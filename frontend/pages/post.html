@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Post Item – Lost & Found Portal</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="../index.html" class="brand"><div class="brand-mark">🔍</div>Lost<span>&</span>Found</a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <div class="nav-right" id="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <h1 id="page-title">Post an Item</h1>
+    <p>Fill in the details below — the more detail, the better the chance of a match</p>
+  </div>
+</div>
+
+<div class="container section">
+  <div style="max-width:640px;margin:0 auto;">
+
+    <!-- TYPE TOGGLE -->
+    <div class="type-toggle">
+      <button class="type-btn" id="btn-lost"  onclick="setType('lost')">🔍 I Lost Something</button>
+      <button class="type-btn" id="btn-found" onclick="setType('found')">📦 I Found Something</button>
+    </div>
+
+    <div class="card" style="border-radius:var(--r-xl);padding:36px;">
+
+      <!-- Header -->
+      <div class="flex-center" style="margin-bottom:28px;gap:14px;">
+        <div id="form-icon" style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:var(--red-bg);">🔍</div>
+        <div>
+          <h2 id="form-title" style="font-size:20px;font-weight:800;">Lost Item Details</h2>
+          <p style="font-size:13px;color:var(--muted);">Fields marked <span style="color:var(--red);">*</span> are required</p>
+        </div>
+      </div>
+
+      <!-- TITLE -->
+      <div class="form-group">
+        <label class="form-label">Item Title <span class="req">*</span></label>
+        <input type="text" id="f-title" class="form-control" placeholder="e.g. iPhone 14 Pro, Brown Leather Wallet…" maxlength="100"/>
+        <div class="form-hint">Be specific — mention brand, model or colour</div>
+      </div>
+
+      <!-- CATEGORY + DATE -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category <span class="req">*</span></label>
+          <select id="f-category" class="form-control">
+            <option value="">Select category…</option>
+            <option>Electronics</option><option>Clothing</option><option>Accessories</option>
+            <option>Documents</option><option>Keys</option><option>Bags</option>
+            <option>Sports</option><option>Books</option><option>Jewellery</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="date-label">Date Lost <span class="req">*</span></label>
+          <input type="date" id="f-date" class="form-control"/>
+        </div>
+      </div>
+
+      <!-- LOCATION -->
+      <div class="form-group">
+        <label class="form-label">Location <span class="req">*</span></label>
+        <input type="text" id="f-location" class="form-control" placeholder="e.g. Library 2nd Floor, Sports Ground, Canteen…" maxlength="200"/>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="form-group">
+        <label class="form-label">Description <span class="req">*</span></label>
+        <textarea id="f-desc" class="form-control" rows="5" maxlength="1000"
+          placeholder="Describe the item in detail — colour, brand, distinguishing marks, what was inside, etc. Minimum 10 characters."></textarea>
+        <div class="form-hint"><span id="desc-count">0</span> / 1000 characters</div>
+      </div>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="form-group">
+        <label class="form-label">Photo (optional)</label>
+        <div id="upload-area" class="upload-area" onclick="document.getElementById('f-img').click()">
+          <div id="upload-placeholder">
+            <div style="font-size:32px;margin-bottom:8px;">📷</div>
+            <p style="font-weight:700;color:var(--ink);font-size:14px;">Click to upload a photo</p>
+            <p style="font-size:12px;color:var(--muted);margin-top:4px;">JPG, PNG, WEBP — max 5MB</p>
+          </div>
+          <img id="img-preview" class="upload-preview" style="display:none;"/>
+        </div>
+        <input type="file" id="f-img" accept="image/*" style="display:none;" onchange="handleImage(this)"/>
+        <button id="remove-img" style="display:none;margin-top:8px;" class="btn btn-sm btn-ghost" onclick="removeImage()">Remove Photo</button>
+      </div>
+
+      <!-- SUBMIT -->
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <a href="search.html" class="btn btn-ghost" style="flex:1;justify-content:center;">Cancel</a>
+        <button id="submit-btn" class="btn btn-primary" style="flex:2;justify-content:center;font-size:15px;padding:13px;" onclick="submitPost()">
+          Post Item →
+        </button>
+      </div>
+
+    </div>
+
+    <!-- MY RECENT POSTS -->
+    <div style="margin-top:40px;" id="my-posts-section" style="display:none;">
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">My Recent Posts</h3>
+      <div class="items-grid" id="my-posts-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Contact modal (needed for my-posts contact buttons) -->
+<div class="modal-backdrop" id="contact-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('contact-modal')">×</button>
+    <div id="contact-body"></div>
+  </div>
+</div>
+
+<footer><strong>Lost & Found Portal</strong> &nbsp;·&nbsp; &copy; 2024</footer>
+
+<script src="../js/api.js"></script>
+<script>
+  renderNavbar('post');
+
+  // Auth guard
+  if (!requireLogin(window.location.pathname.split('/').pop())) {}
+
+  // Set today's date
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+
+  // Determine initial type from URL
+  const urlType = new URLSearchParams(location.search).get('type') || 'lost';
+  let currentType = urlType;
+  setType(urlType);
+
+  function setType(t) {
+    currentType = t;
+    document.getElementById('btn-lost').className  = 'type-btn' + (t==='lost'  ? ' active-lost'  : '');
+    document.getElementById('btn-found').className = 'type-btn' + (t==='found' ? ' active-found' : '');
+    document.getElementById('form-icon').style.background = t==='lost' ? 'var(--red-bg)' : 'var(--teal-bg)';
+    document.getElementById('form-icon').textContent = t==='lost' ? '🔍' : '📦';
+    document.getElementById('form-title').textContent = t==='lost' ? 'Lost Item Details' : 'Found Item Details';
+    document.getElementById('date-label').innerHTML = (t==='lost' ? 'Date Lost' : 'Date Found') + ' <span class="req">*</span>';
+    document.getElementById('submit-btn').className = 'btn ' + (t==='lost' ? 'btn-dark' : 'btn-primary') + ' btn-submit-main';
+    document.getElementById('submit-btn').style.cssText = 'flex:2;justify-content:center;font-size:15px;padding:13px;';
+  }
+
+  // Character counter
+  document.getElementById('f-desc').addEventListener('input', function() {
+    document.getElementById('desc-count').textContent = this.value.length;
+  });
+
+  function handleImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5*1024*1024) { toast('Image must be under 5MB', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('img-preview').src = e.target.result;
+      document.getElementById('img-preview').style.display = 'block';
+      document.getElementById('upload-placeholder').style.display = 'none';
+      document.getElementById('remove-img').style.display = 'inline-flex';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    document.getElementById('f-img').value = '';
+    document.getElementById('img-preview').style.display = 'none';
+    document.getElementById('upload-placeholder').style.display = 'block';
+    document.getElementById('remove-img').style.display = 'none';
+  }
+
+  async function submitPost() {
+    clearErrors();
+    const title    = document.getElementById('f-title').value.trim();
+    const category = document.getElementById('f-category').value;
+    const date     = document.getElementById('f-date').value;
+    const location = document.getElementById('f-location').value.trim();
+    const desc     = document.getElementById('f-desc').value.trim();
+    const imgFile  = document.getElementById('f-img').files[0];
+
+    let valid = true;
+    if (!title || title.length < 3)     { fieldError('f-title','Title must be at least 3 characters'); valid=false; }
+    if (!category)                        { fieldError('f-category','Please select a category'); valid=false; }
+    if (!date)                            { fieldError('f-date','Date is required'); valid=false; }
+    if (!location)                        { fieldError('f-location','Location is required'); valid=false; }
+    if (!desc || desc.length < 10)       { fieldError('f-desc','Description must be at least 10 characters'); valid=false; }
+    if (!valid) return;
+
+    const fd = new FormData();
+    fd.append('type',        currentType);
+    fd.append('title',       title);
+    fd.append('category',    category);
+    fd.append('date',        date);
+    fd.append('location',    location);
+    fd.append('description', desc);
+    if (imgFile) fd.append('image', imgFile);
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin">⟳</span> Posting…';
+
+    try {
+      await Items.create(fd);
+      toast('Item posted successfully! ✅');
+      setTimeout(() => window.location.href = 'search.html', 1200);
+    } catch(err) {
+      toast(err.message, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Post Item →';
+    }
+  }
+
+  // Load my recent posts
+  if (isLoggedIn()) {
+    Items.getMy().then(d => {
+      if (d.items.length) {
+        document.getElementById('my-posts-section').style.display = 'block';
+        document.getElementById('my-posts-grid').innerHTML =
+          d.items.slice(0,3).map(item => itemCard(item, { showContact:false, canDelete:true, canResolve:true })).join('');
+      }
+    }).catch(()=>{});
+  }
+</script>
+</body>
+</html>

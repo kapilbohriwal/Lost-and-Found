@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact – Lost & Found Portal</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="../index.html" class="brand"><div class="brand-mark">🔍</div>Lost<span>&</span>Found</a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <div class="nav-right" id="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>Contact Us</h1>
+    <p>Have a question or need help? We're here for you.</p>
+  </div>
+</div>
+
+<div class="container section">
+  <div style="display:grid;grid-template-columns:3fr 2fr;gap:32px;max-width:900px;margin:0 auto;">
+
+    <!-- FORM -->
+    <div class="card" style="padding:36px;border-radius:var(--r-xl);">
+      <h2 style="font-family:var(--font-serif);font-size:26px;margin-bottom:6px;">Send a Message</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:28px;">We respond within 24 hours on working days.</p>
+
+      <div id="contact-success" style="display:none;text-align:center;padding:28px 0;">
+        <div style="font-size:56px;margin-bottom:14px;">✅</div>
+        <h3 style="font-family:var(--font-serif);font-size:24px;margin-bottom:8px;">Message Sent!</h3>
+        <p style="color:var(--muted);font-size:14px;line-height:1.6;">Our team will get back to you within 24 hours.</p>
+        <button class="btn btn-primary" style="margin-top:24px;" onclick="resetForm()">Send Another</button>
+      </div>
+
+      <div id="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your Name <span class="req">*</span></label>
+            <input type="text" id="c-name" class="form-control" placeholder="Full name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email <span class="req">*</span></label>
+            <input type="email" id="c-email" class="form-control" placeholder="your@email.com"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject <span class="req">*</span></label>
+          <select id="c-subject" class="form-control">
+            <option value="">Select a topic…</option>
+            <option>General Inquiry</option>
+            <option>Report Fake Post</option>
+            <option>Account Issue</option>
+            <option>Item Not Returned</option>
+            <option>Technical Problem</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message <span class="req">*</span></label>
+          <textarea id="c-msg" class="form-control" rows="6" placeholder="Describe your issue or question in detail…" maxlength="1000"></textarea>
+          <div class="form-hint"><span id="c-count">0</span> / 1000 characters</div>
+        </div>
+        <button id="c-submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:15px;" onclick="submitContact()">
+          Send Message →
+        </button>
+      </div>
+    </div>
+
+    <!-- INFO PANEL -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="card" style="padding:24px;">
+        <div style="font-size:28px;margin-bottom:10px;">📍</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;">Campus Office</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.8;">Student Services Building<br>Ground Floor, Room 101<br>Main Campus<br><strong style="color:var(--ink);">Mon–Sat: 9am – 5pm</strong></p>
+      </div>
+
+      <div class="card" style="padding:24px;">
+        <div style="font-size:28px;margin-bottom:10px;">📧</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;">Email</h3>
+        <p style="font-size:13px;color:var(--muted);">lostfound@college.edu</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px;">Reply within 24 hours</p>
+      </div>
+
+      <div class="card" style="padding:24px;">
+        <div style="font-size:28px;margin-bottom:10px;">📞</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;">Phone</h3>
+        <p style="font-size:13px;color:var(--muted);">+91 98765 43210</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px;">Office hours only</p>
+      </div>
+
+      <div class="card" style="padding:24px;background:var(--teal-bg);border-color:#9FE1CB;">
+        <h3 style="font-size:14px;font-weight:700;color:var(--teal2);margin-bottom:10px;">💡 Quick Tips</h3>
+        <ul style="font-size:13px;color:var(--teal2);line-height:2.2;padding-left:16px;">
+          <li>Search before posting a new item</li>
+          <li>Add a photo for faster matching</li>
+          <li>Mark resolved once item is returned</li>
+          <li>Include your contact in description</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer><strong>Lost & Found Portal</strong> &nbsp;·&nbsp; &copy; 2024</footer>
+
+<script src="../js/api.js"></script>
+<script>
+  renderNavbar('contact');
+
+  // Pre-fill if logged in
+  const user = getUser();
+  if (user) {
+    document.getElementById('c-name').value  = user.name;
+    document.getElementById('c-email').value = user.email;
+  }
+
+  document.getElementById('c-msg').addEventListener('input', function() {
+    document.getElementById('c-count').textContent = this.value.length;
+  });
+
+  function submitContact() {
+    clearErrors();
+    const name    = document.getElementById('c-name').value.trim();
+    const email   = document.getElementById('c-email').value.trim();
+    const subject = document.getElementById('c-subject').value;
+    const msg     = document.getElementById('c-msg').value.trim();
+    let valid = true;
+    if (!name)                              { fieldError('c-name','Name is required'); valid=false; }
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) { fieldError('c-email','Valid email required'); valid=false; }
+    if (!subject)                           { fieldError('c-subject','Please select a subject'); valid=false; }
+    if (!msg || msg.length < 10)            { fieldError('c-msg','Message must be at least 10 characters'); valid=false; }
+    if (!valid) return;
+
+    const btn = document.getElementById('c-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin">⟳</span> Sending…';
+
+    // Simulate send (replace with real email API if needed)
+    setTimeout(() => {
+      document.getElementById('contact-form').style.display    = 'none';
+      document.getElementById('contact-success').style.display = 'block';
+      toast('Message sent successfully!');
+    }, 1000);
+  }
+
+  function resetForm() {
+    document.getElementById('contact-form').style.display    = 'block';
+    document.getElementById('contact-success').style.display = 'none';
+    document.getElementById('c-subject').value = '';
+    document.getElementById('c-msg').value     = '';
+    document.getElementById('c-count').textContent = '0';
+    const btn = document.getElementById('c-submit');
+    btn.disabled = false;
+    btn.textContent = 'Send Message →';
+  }
+</script>
+</body>
+</html>

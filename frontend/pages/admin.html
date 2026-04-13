@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel – Lost & Found Portal</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="../index.html" class="brand"><div class="brand-mark">🔍</div>Lost<span>&</span>Found</a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <div class="nav-right" id="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>Admin Panel</h1>
+    <p>Manage all posts, users, and platform activity</p>
+  </div>
+</div>
+
+<div class="container section" id="admin-root">
+  <!-- Access check fills this -->
+</div>
+
+<footer><strong>Lost & Found Portal</strong> &nbsp;·&nbsp; &copy; 2024</footer>
+
+<script src="../js/api.js"></script>
+<script>
+  renderNavbar('admin');
+
+  const root = document.getElementById('admin-root');
+
+  // Guard
+  if (!isLoggedIn()) { window.location.href = 'login.html'; }
+  else if (!isAdmin()) {
+    root.innerHTML = `<div class="empty" style="padding:80px 20px;"><div class="empty-icon">🔒</div><h2 style="font-size:22px;margin-bottom:8px;">Admin Access Only</h2><p>You do not have permission to view this page.</p><a href="../index.html" class="btn btn-primary" style="margin-top:20px;">Go Home</a></div>`;
+  } else {
+    initAdmin();
+  }
+
+  async function initAdmin() {
+    root.innerHTML = `
+      <!-- STATS -->
+      <div class="stats-grid" id="a-stats">
+        ${['Users','Lost','Found','Resolved','Messages'].map(l=>`<div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-value skeleton" style="height:34px;width:52px;"></div><div class="stat-label">${l}</div></div>`).join('')}
+      </div>
+
+      <!-- TABS -->
+      <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" id="tab-items-btn" onclick="showTab('items')">📋 All Posts</button>
+        <button class="btn btn-ghost  btn-sm" id="tab-users-btn" onclick="showTab('users')">👥 Users</button>
+      </div>
+
+      <!-- ITEMS TAB -->
+      <div id="tab-items">
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 20px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div><h3 style="font-size:16px;font-weight:700;">All Posts</h3><p id="a-items-count" style="font-size:12px;color:var(--muted);">Loading…</p></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <select id="a-type"   class="form-control" style="width:auto;" onchange="loadItems()"><option value="all">All Types</option><option value="lost">Lost</option><option value="found">Found</option></select>
+              <select id="a-status" class="form-control" style="width:auto;" onchange="loadItems()"><option value="all">All Status</option><option value="active">Active</option><option value="resolved">Resolved</option></select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table" id="a-items-table">
+              <thead><tr><th>Item</th><th>Type</th><th>Category</th><th>Location</th><th>Date</th><th>Posted By</th><th>Status</th><th>Views</th><th>Actions</th></tr></thead>
+              <tbody id="a-items-body"><tr><td colspan="9" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS TAB -->
+      <div id="tab-users" style="display:none;">
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 20px;border-bottom:1.5px solid var(--border);">
+            <h3 style="font-size:16px;font-weight:700;">Registered Users</h3>
+            <p id="a-users-count" style="font-size:12px;color:var(--muted);">Loading…</p>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+              <tbody id="a-users-body"><tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    loadStats();
+    loadItems();
+  }
+
+  async function loadStats() {
+    try {
+      const d = await Admin.stats();
+      const s = d.stats;
+      document.getElementById('a-stats').innerHTML = [
+        { label:'Users',    value:s.users,    icon:'👥', color:'var(--violet)' },
+        { label:'Lost',     value:s.lost,     icon:'🔍', color:'var(--red)'    },
+        { label:'Found',    value:s.found,    icon:'📦', color:'var(--teal)'   },
+        { label:'Resolved', value:s.resolved, icon:'✅', color:'#22c55e'       },
+        { label:'Messages', value:s.messages, icon:'💬', color:'var(--amber)'  },
+      ].map((st,i) => `
+        <div class="stat-card fade-up delay-${i+1}">
+          <div class="stat-icon">${st.icon}</div>
+          <div class="stat-value" style="color:${st.color};">${st.value}</div>
+          <div class="stat-label">${st.label}</div>
+        </div>`).join('');
+    } catch(err) { toast(err.message,'error'); }
+  }
+
+  async function loadItems() {
+    const type   = document.getElementById('a-type')?.value;
+    const status = document.getElementById('a-status')?.value;
+    try {
+      const d = await Admin.items({ type, status });
+      document.getElementById('a-items-count').textContent = `${d.total} post${d.total!==1?'s':''}`;
+      const me = getUser();
+      document.getElementById('a-items-body').innerHTML = d.items.length ? d.items.map(i => {
+        const ava   = i.postedBy?.avatar || 'U';
+        const uname = i.postedBy?.name   || 'Unknown';
+        const avaBg = i.type==='lost' ? '#FDEAEA' : '#E6FAF4';
+        const avaClr= i.type==='lost' ? 'var(--red)' : 'var(--teal2)';
+        const dt    = i.date ? new Date(i.date).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+        return `<tr>
+          <td style="font-weight:700;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.title}</td>
+          <td><span class="badge badge-${i.type}">${i.type}</span></td>
+          <td style="color:var(--muted);">${i.category}</td>
+          <td style="color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.location}</td>
+          <td style="color:var(--muted);white-space:nowrap;">${dt}</td>
+          <td>
+            <div class="flex-center">
+              <div class="avatar" style="width:26px;height:26px;font-size:10px;font-weight:800;background:${avaBg};color:${avaClr};">${ava}</div>
+              <span style="font-size:12px;color:var(--muted);">${uname}</span>
+            </div>
+          </td>
+          <td><span class="badge badge-${i.status}">${i.status}</span></td>
+          <td style="color:var(--muted);text-align:center;">${i.views||0}</td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              ${i.status!=='resolved'?`<button class="btn btn-sm" style="background:var(--teal-bg);color:var(--teal2);border:none;padding:5px 10px;" onclick="doResolve('${i._id}')">Resolve</button>`:''}
+              <button class="btn btn-sm" style="background:var(--red-bg);color:var(--red);border:none;padding:5px 10px;" onclick="doDelete('${i._id}')">Delete</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('') : `<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--muted);">No posts found.</td></tr>`;
+    } catch(err) {
+      document.getElementById('a-items-body').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--red);">${err.message}</td></tr>`;
+    }
+  }
+
+  async function loadUsers() {
+    try {
+      const d = await Admin.users();
+      const me = getUser();
+      document.getElementById('a-users-count').textContent = `${d.users.length} registered user${d.users.length!==1?'s':''}`;
+      document.getElementById('a-users-body').innerHTML = d.users.map(u => `
+        <tr>
+          <td>
+            <div class="flex-center">
+              <div class="avatar avatar-teal" style="width:32px;height:32px;font-size:12px;">${u.avatar||u.name.slice(0,2).toUpperCase()}</div>
+              <span style="font-weight:700;">${u.name}</span>
+            </div>
+          </td>
+          <td style="color:var(--muted);">${u.email}</td>
+          <td><span class="badge ${u.role==='admin'?'badge-admin':'badge-active'}">${u.role}</span></td>
+          <td style="color:var(--muted);">${u.createdAt?new Date(u.createdAt).toLocaleDateString('en-IN'):'—'}</td>
+          <td>
+            ${u._id!==me._id
+              ? `<button class="btn btn-sm" style="background:var(--red-bg);color:var(--red);border:none;" onclick="deleteUser('${u._id}')">Delete</button>`
+              : `<span style="font-size:12px;color:var(--muted);padding:4px 8px;">You</span>`}
+          </td>
+        </tr>`).join('');
+    } catch(err) {
+      document.getElementById('a-users-body').innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--red);">${err.message}</td></tr>`;
+    }
+  }
+
+  function showTab(tab) {
+    document.getElementById('tab-items').style.display = tab==='items' ? 'block' : 'none';
+    document.getElementById('tab-users').style.display = tab==='users' ? 'block' : 'none';
+    document.getElementById('tab-items-btn').className = 'btn btn-sm ' + (tab==='items'?'btn-primary':'btn-ghost');
+    document.getElementById('tab-users-btn').className = 'btn btn-sm ' + (tab==='users'?'btn-primary':'btn-ghost');
+    if (tab==='users') loadUsers();
+  }
+
+  async function deleteUser(id) {
+    if (!confirm('Delete this user and all their posts? This cannot be undone.')) return;
+    try {
+      await Admin.deleteUser(id);
+      toast('User deleted','error');
+      loadStats();
+      loadUsers();
+    } catch(err) { toast(err.message,'error'); }
+  }
+
+  // Override doResolve / doDelete to reload admin table
+  async function doDelete(id) {
+    if (!confirm('Permanently delete this post?')) return;
+    try { await Items.delete(id); toast('Post deleted','error'); loadStats(); loadItems(); }
+    catch(err) { toast(err.message,'error'); }
+  }
+  async function doResolve(id) {
+    try { await Items.resolve(id); toast('Marked as resolved ✅'); loadStats(); loadItems(); }
+    catch(err) { toast(err.message,'error'); }
+  }
+</script>
+</body>
+</html>

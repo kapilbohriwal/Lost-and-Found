@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lost & Found Portal – Campus Community</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">🔍</div>
+      Lost<span>&</span>Found
+    </a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <div class="nav-right" id="nav-auth"></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="container" style="position:relative;">
+    <div class="hero-tag fade-up">🎓 Campus Community Portal</div>
+    <h1 class="fade-up delay-1">
+      Find What's<br><em>Lost.</em> Return<br>What's <em>Found.</em>
+    </h1>
+    <p class="hero-sub fade-up delay-2">
+      A trusted platform for students to post, search, and reclaim lost belongings across campus — fast and free.
+    </p>
+    <div class="hero-btns fade-up delay-3">
+      <a href="pages/post.html" class="btn btn-primary btn-lg">Post an Item</a>
+      <a href="pages/search.html" class="btn btn-ghost btn-lg" style="color:#fff;border-color:rgba(255,255,255,.2);">Browse All →</a>
+    </div>
+  </div>
+  <!-- Floating stats -->
+  <div class="hero-float" id="hero-stats">
+    <div class="hero-float-card"><div class="label">Lost Items</div><div class="val" id="hs-lost">—</div><div class="sub">Posted this month</div></div>
+    <div class="hero-float-card"><div class="label">Found Items</div><div class="val" id="hs-found">—</div><div class="sub">Waiting to be claimed</div></div>
+    <div class="hero-float-card"><div class="label">Resolved</div><div class="val" id="hs-resolved">—</div><div class="sub">Reunited so far</div></div>
+    <div class="hero-float-card"><div class="label">Total Posts</div><div class="val" id="hs-total">—</div><div class="sub">In our database</div></div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="container section-sm">
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="stat-icon">🔍</div><div class="stat-value skeleton" style="height:36px;width:60px;"></div><div class="stat-label">Lost Items</div></div>
+    <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-value skeleton" style="height:36px;width:60px;"></div><div class="stat-label">Found Items</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value skeleton" style="height:36px;width:60px;"></div><div class="stat-label">Resolved</div></div>
+    <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-value skeleton" style="height:36px;width:60px;"></div><div class="stat-label">Total Posts</div></div>
+  </div>
+</div>
+
+<!-- RECENT ITEMS -->
+<div class="container section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+    <div>
+      <h2 style="font-family:var(--font-serif);font-size:30px;">Recent Posts</h2>
+      <p style="color:var(--muted);font-size:14px;margin-top:4px;">Latest items reported on campus</p>
+    </div>
+    <a href="pages/search.html" class="btn btn-ghost">View All →</a>
+  </div>
+  <div class="items-grid" id="recent-grid">
+    <!-- skeleton -->
+    <div class="card" style="overflow:hidden;"><div class="skeleton" style="height:160px;border-radius:0;"></div><div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px;"><div class="skeleton" style="height:16px;width:60%;"></div><div class="skeleton" style="height:20px;width:85%;"></div><div class="skeleton" style="height:40px;"></div></div></div>
+    <div class="card" style="overflow:hidden;"><div class="skeleton" style="height:160px;border-radius:0;"></div><div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px;"><div class="skeleton" style="height:16px;width:60%;"></div><div class="skeleton" style="height:20px;width:85%;"></div><div class="skeleton" style="height:40px;"></div></div></div>
+    <div class="card" style="overflow:hidden;"><div class="skeleton" style="height:160px;border-radius:0;"></div><div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px;"><div class="skeleton" style="height:16px;width:60%;"></div><div class="skeleton" style="height:20px;width:85%;"></div><div class="skeleton" style="height:40px;"></div></div></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div style="background:var(--ink);padding:64px 0;">
+  <div class="container" style="text-align:center;">
+    <p style="color:var(--teal);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Simple Process</p>
+    <h2 style="font-family:var(--font-serif);font-size:36px;color:#fff;margin-bottom:48px;">How It Works</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:820px;margin:0 auto;">
+      <div style="padding:28px 20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--r-lg);">
+        <div style="width:52px;height:52px;background:var(--teal-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">📝</div>
+        <h3 style="color:#fff;font-size:16px;font-weight:700;margin-bottom:8px;">1. Post Your Item</h3>
+        <p style="color:rgba(255,255,255,.4);font-size:13px;line-height:1.7;">Describe what you lost or found with photo, location and date.</p>
+      </div>
+      <div style="padding:28px 20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--r-lg);">
+        <div style="width:52px;height:52px;background:var(--teal-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">🔎</div>
+        <h3 style="color:#fff;font-size:16px;font-weight:700;margin-bottom:8px;">2. Search & Match</h3>
+        <p style="color:rgba(255,255,255,.4);font-size:13px;line-height:1.7;">Use filters to search by name, category, or location in the database.</p>
+      </div>
+      <div style="padding:28px 20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--r-lg);">
+        <div style="width:52px;height:52px;background:var(--teal-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">🤝</div>
+        <h3 style="color:#fff;font-size:16px;font-weight:700;margin-bottom:8px;">3. Connect & Resolve</h3>
+        <p style="color:rgba(255,255,255,.4);font-size:13px;line-height:1.7;">Message the owner directly and mark the item as resolved once returned.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="container section" style="text-align:center;">
+  <div style="background:var(--ink2);border-radius:var(--r-xl);padding:52px 32px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(0,184,138,.12) 0%,transparent 60%);pointer-events:none;"></div>
+    <h2 style="font-family:var(--font-serif);font-size:36px;color:#fff;margin-bottom:12px;position:relative;">Lost something recently?</h2>
+    <p style="color:rgba(255,255,255,.5);font-size:15px;margin-bottom:28px;position:relative;">Post it now and let the community help you find it.</p>
+    <div class="hero-btns" style="justify-content:center;position:relative;">
+      <a href="pages/post.html?type=lost"  class="btn btn-primary btn-lg">🔍 Post Lost Item</a>
+      <a href="pages/post.html?type=found" class="btn" style="background:rgba(255,255,255,.1);color:#fff;font-size:16px;padding:14px 30px;border-radius:var(--r);">📦 Post Found Item</a>
+    </div>
+  </div>
+</div>
+
+<!-- Contact modal -->
+<div class="modal-backdrop" id="contact-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('contact-modal')">×</button>
+    <div id="contact-body"></div>
+  </div>
+</div>
+
+<footer><strong>Lost & Found Portal</strong> &nbsp;·&nbsp; Built for campus community &nbsp;·&nbsp; Powered by MongoDB &nbsp;·&nbsp; &copy; 2024</footer>
+
+<script src="js/api.js"></script>
+<script>
+  renderNavbar('home');
+
+  // Load stats
+  Items.getStats().then(d => {
+    const s = d.stats;
+    document.getElementById('stats-grid').innerHTML = [
+      { label:'Lost Items',  value:s.lost,     icon:'🔍', color:'var(--red)'    },
+      { label:'Found Items', value:s.found,    icon:'📦', color:'var(--teal)'   },
+      { label:'Resolved',    value:s.resolved, icon:'✅', color:'var(--violet)' },
+      { label:'Total Posts', value:s.total,    icon:'📋', color:'var(--amber)'  },
+    ].map((st,i) => `
+      <div class="stat-card fade-up delay-${i+1}">
+        <div class="stat-icon">${st.icon}</div>
+        <div class="stat-value" style="color:${st.color};">${st.value}</div>
+        <div class="stat-label">${st.label}</div>
+      </div>`).join('');
+    document.getElementById('hs-lost').textContent     = s.lost;
+    document.getElementById('hs-found').textContent    = s.found;
+    document.getElementById('hs-resolved').textContent = s.resolved;
+    document.getElementById('hs-total').textContent    = s.total;
+  }).catch(() => {});
+
+  // Load recent items
+  Items.getAll({ limit: 6 }).then(d => {
+    const grid = document.getElementById('recent-grid');
+    if (!d.items.length) { grid.innerHTML = '<div class="empty"><div class="empty-icon">🫙</div><p>No items posted yet.</p></div>'; return; }
+    grid.innerHTML = d.items.map(item => itemCard(item, {showContact:true})).join('');
+  }).catch(err => {
+    document.getElementById('recent-grid').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>${err.message}</p></div>`;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Items – Lost & Found Portal</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="../index.html" class="brand"><div class="brand-mark">🔍</div>Lost<span>&</span>Found</a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <div class="nav-right" id="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>Browse Items</h1>
+    <p>Search through all lost and found posts from our MongoDB database</p>
+  </div>
+</div>
+
+<div class="container section">
+
+  <!-- SEARCH + FILTERS -->
+  <div class="search-box">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="s-search" class="form-control" placeholder="Search by title, location, description…"/>
+    </div>
+    <div class="form-group" style="margin:0;min-width:130px;">
+      <label class="form-label" style="margin-bottom:5px;">Type</label>
+      <select id="s-type" class="form-control">
+        <option value="all">All Types</option>
+        <option value="lost">Lost</option>
+        <option value="found">Found</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0;min-width:150px;">
+      <label class="form-label" style="margin-bottom:5px;">Category</label>
+      <select id="s-cat" class="form-control">
+        <option value="all">All Categories</option>
+        <option>Electronics</option><option>Clothing</option><option>Accessories</option>
+        <option>Documents</option><option>Keys</option><option>Bags</option>
+        <option>Sports</option><option>Books</option><option>Jewellery</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0;min-width:130px;">
+      <label class="form-label" style="margin-bottom:5px;">Status</label>
+      <select id="s-status" class="form-control">
+        <option value="all">All Status</option>
+        <option value="active">Active</option>
+        <option value="resolved">Resolved</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0;min-width:130px;">
+      <label class="form-label" style="margin-bottom:5px;">Sort By</label>
+      <select id="s-sort" class="form-control">
+        <option value="-createdAt">Newest First</option>
+        <option value="createdAt">Oldest First</option>
+        <option value="-views">Most Viewed</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="fetchItems(1)" style="align-self:flex-end;">Search</button>
+    <button class="btn btn-ghost"   onclick="resetFilters()" style="align-self:flex-end;">Reset</button>
+  </div>
+
+  <!-- RESULT META -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+    <p id="result-meta" style="font-size:14px;color:var(--muted);">Loading…</p>
+    <div style="display:flex;gap:10px;">
+      <a href="post.html?type=lost"  class="btn btn-sm btn-ghost" style="border-color:var(--red);color:var(--red);">🔍 Post Lost</a>
+      <a href="post.html?type=found" class="btn btn-sm btn-primary">📦 Post Found</a>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="items-grid" id="items-grid"></div>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- Contact modal -->
+<div class="modal-backdrop" id="contact-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('contact-modal')">×</button>
+    <div id="contact-body"></div>
+  </div>
+</div>
+
+<footer><strong>Lost & Found Portal</strong> &nbsp;·&nbsp; &copy; 2024</footer>
+
+<script src="../js/api.js"></script>
+<script>
+  renderNavbar('search');
+  let currentPage = 1;
+
+  // Pre-fill from URL params
+  const urlP = new URLSearchParams(location.search);
+  if (urlP.get('type'))   document.getElementById('s-type').value   = urlP.get('type');
+  if (urlP.get('search')) document.getElementById('s-search').value = urlP.get('search');
+
+  async function fetchItems(page = 1) {
+    currentPage = page;
+    const search = document.getElementById('s-search').value.trim();
+    const type   = document.getElementById('s-type').value;
+    const cat    = document.getElementById('s-cat').value;
+    const status = document.getElementById('s-status').value;
+    const sort   = document.getElementById('s-sort').value;
+
+    document.getElementById('items-grid').innerHTML = skeletonCards(6);
+    document.getElementById('result-meta').textContent = 'Searching…';
+    document.getElementById('pagination').innerHTML = '';
+
+    try {
+      const d = await Items.getAll({ search, type, category: cat, status, sort, page, limit: 9 });
+      document.getElementById('result-meta').innerHTML =
+        `<strong>${d.total}</strong> item${d.total!==1?'s':''} found` +
+        (search ? ` for "<em>${search}</em>"` : '');
+
+      if (!d.items.length) {
+        document.getElementById('items-grid').innerHTML = `
+          <div class="empty" style="grid-column:1/-1;">
+            <div class="empty-icon">🫙</div>
+            <p>No items match your search.<br>Try different keywords or <a href="post.html" style="color:var(--teal);">post a new item</a>.</p>
+          </div>`;
+        return;
+      }
+      document.getElementById('items-grid').innerHTML = d.items.map(item => itemCard(item, {showContact:true})).join('');
+      renderPagination(d.page, d.pages);
+    } catch(err) {
+      document.getElementById('items-grid').innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">⚠️</div><p>${err.message}</p></div>`;
+    }
+  }
+
+  function renderPagination(cur, total) {
+    if (total <= 1) return;
+    const el = document.getElementById('pagination');
+    let html = '';
+    if (cur > 1) html += `<button class="page-btn" onclick="fetchItems(${cur-1})">‹</button>`;
+    for (let i = 1; i <= total; i++) {
+      if (i===1 || i===total || Math.abs(i-cur)<=2) {
+        html += `<button class="page-btn ${i===cur?'active':''}" onclick="fetchItems(${i})">${i}</button>`;
+      } else if (Math.abs(i-cur)===3) {
+        html += `<span style="padding:0 6px;color:var(--muted);">…</span>`;
+      }
+    }
+    if (cur < total) html += `<button class="page-btn" onclick="fetchItems(${cur+1})">›</button>`;
+    el.innerHTML = html;
+  }
+
+  function resetFilters() {
+    ['s-search','s-type','s-cat','s-status','s-sort'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = el.tagName==='INPUT' ? '' : el.options[0].value;
+    });
+    fetchItems(1);
+  }
+
+  // Debounce search input
+  let timer;
+  document.getElementById('s-search').addEventListener('input', () => {
+    clearTimeout(timer); timer = setTimeout(() => fetchItems(1), 420);
+  });
+  ['s-type','s-cat','s-status','s-sort'].forEach(id =>
+    document.getElementById(id).addEventListener('change', () => fetchItems(1))
+  );
+
+  fetchItems(1);
+</script>
+</body>
+</html>

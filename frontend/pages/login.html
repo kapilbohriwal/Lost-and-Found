@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – Lost & Found Portal</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="../index.html" class="brand"><div class="brand-mark">🔍</div>Lost<span>&</span>Found</a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <div class="nav-right" id="nav-auth"></div>
+  </div>
+</nav>
+
+<div style="min-height:calc(100vh - 66px);display:flex;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(145deg,var(--ink) 0%,var(--ink2) 100%);">
+  <div style="width:100%;max-width:460px;">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:32px;" class="fade-up">
+      <div style="width:60px;height:60px;background:var(--teal);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px;box-shadow:0 8px 32px rgba(0,184,138,.35);">🔍</div>
+      <h1 style="font-family:var(--font-serif);font-size:30px;color:#fff;margin-bottom:6px;">Welcome Back</h1>
+      <p style="color:rgba(255,255,255,.45);font-size:14px;">Sign in to post and manage items</p>
+    </div>
+
+    <div class="card fade-up delay-1" style="border-radius:var(--r-xl);padding:36px;">
+      <!-- Tabs -->
+      <div class="tab-bar" style="margin-bottom:28px;">
+        <button class="tab-btn active" id="tab-login"    onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn"        id="tab-register" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="form-login">
+        <div class="form-group">
+          <label class="form-label">Email Address <span class="req">*</span></label>
+          <input type="email" id="l-email" class="form-control" placeholder="your@email.com" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span class="req">*</span></label>
+          <div style="position:relative;">
+            <input type="password" id="l-pass" class="form-control" placeholder="••••••••" autocomplete="current-password"/>
+            <button type="button" onclick="togglePwd('l-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;">👁</button>
+          </div>
+        </div>
+        <button id="btn-login" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;font-size:15px;padding:13px;" onclick="doLogin()">Sign In →</button>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:16px;">
+          Demo — Admin: <strong>admin@college.edu</strong> / <strong>admin123</strong><br>
+          User: <strong>arjun@college.edu</strong> / <strong>pass123</strong>
+        </p>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="form-register" style="display:none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" id="r-name" class="form-control" placeholder="Your name" autocomplete="name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone (optional)</label>
+            <input type="tel" id="r-phone" class="form-control" placeholder="+91 98765..."/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address <span class="req">*</span></label>
+          <input type="email" id="r-email" class="form-control" placeholder="your@email.com" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span class="req">*</span></label>
+          <div style="position:relative;">
+            <input type="password" id="r-pass" class="form-control" placeholder="Min 6 characters" autocomplete="new-password"/>
+            <button type="button" onclick="togglePwd('r-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;">👁</button>
+          </div>
+          <div class="form-hint">Tip: include "admin" in your email to get admin access</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password <span class="req">*</span></label>
+          <input type="password" id="r-pass2" class="form-control" placeholder="Repeat password" autocomplete="new-password"/>
+        </div>
+        <button id="btn-register" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;font-size:15px;padding:13px;" onclick="doRegister()">Create Account →</button>
+      </div>
+    </div>
+
+    <p style="text-align:center;color:rgba(255,255,255,.25);font-size:12px;margin-top:20px;">
+      By signing in you agree to our community guidelines
+    </p>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+  renderNavbar('');
+  if (isLoggedIn()) window.location.href = '../index.html';
+
+  function switchTab(t) {
+    ['login','register'].forEach(x => {
+      document.getElementById(`tab-${x}`).classList.toggle('active', x===t);
+      document.getElementById(`form-${x}`).style.display = x===t ? 'block' : 'none';
+    });
+    clearErrors();
+  }
+
+  function togglePwd(id, btn) {
+    const el = document.getElementById(id);
+    el.type = el.type==='password' ? 'text' : 'password';
+    btn.textContent = el.type==='password' ? '👁' : '🙈';
+  }
+
+  function setBtnLoading(id, loading, defaultText) {
+    const b = document.getElementById(id);
+    b.disabled = loading;
+    b.innerHTML = loading ? '<span class="spin">⟳</span> Please wait...' : defaultText;
+  }
+
+  async function doLogin() {
+    clearErrors();
+    const email = document.getElementById('l-email').value.trim();
+    const pass  = document.getElementById('l-pass').value;
+    let valid = true;
+    if (!email)  { fieldError('l-email','Email is required'); valid=false; }
+    else if (!/^\S+@\S+\.\S+$/.test(email)) { fieldError('l-email','Enter a valid email'); valid=false; }
+    if (!pass)   { fieldError('l-pass','Password is required'); valid=false; }
+    if (!valid) return;
+
+    setBtnLoading('btn-login', true, 'Sign In →');
+    try {
+      const d = await Auth.login(email, pass);
+      saveAuth(d.token, d.user);
+      toast('Welcome back, ' + d.user.name.split(' ')[0] + '! 👋');
+      const redirect = sessionStorage.getItem('lf_redirect');
+      sessionStorage.removeItem('lf_redirect');
+      setTimeout(() => window.location.href = redirect || '../index.html', 800);
+    } catch(err) {
+      toast(err.message, 'error');
+      setBtnLoading('btn-login', false, 'Sign In →');
+    }
+  }
+
+  async function doRegister() {
+    clearErrors();
+    const name  = document.getElementById('r-name').value.trim();
+    const email = document.getElementById('r-email').value.trim();
+    const pass  = document.getElementById('r-pass').value;
+    const pass2 = document.getElementById('r-pass2').value;
+    const phone = document.getElementById('r-phone').value.trim();
+    let valid = true;
+    if (!name || name.length < 2)   { fieldError('r-name','Name must be at least 2 characters'); valid=false; }
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) { fieldError('r-email','Enter a valid email'); valid=false; }
+    if (!pass || pass.length < 6)   { fieldError('r-pass','Password must be at least 6 characters'); valid=false; }
+    if (pass !== pass2)              { fieldError('r-pass2','Passwords do not match'); valid=false; }
+    if (!valid) return;
+
+    setBtnLoading('btn-register', true, 'Create Account →');
+    try {
+      const d = await Auth.register({ name, email, password: pass, phone });
+      saveAuth(d.token, d.user);
+      toast('Account created! Welcome ' + d.user.name.split(' ')[0] + ' 🎉');
+      setTimeout(() => window.location.href = '../index.html', 800);
+    } catch(err) {
+      toast(err.message, 'error');
+      setBtnLoading('btn-register', false, 'Create Account →');
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('form-login').style.display !== 'none') doLogin();
+    else doRegister();
+  });
+</script>
+</body>
+</html>
