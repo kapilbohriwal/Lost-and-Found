@@ -11,16 +11,20 @@ const app = express();
 connectDB();
 
 // ── Middleware ─────────────────────────────────────────────
+const cors = require('cors');
+
 app.use(cors({
   origin: [
-    'https://lost-and-found-production-9b86.up.railway.app',
-    'http://127.0.0.1:5000',
-    'http://localhost:5500',
-    'http://127.0.0.1:5500',
-    'http://localhost:3000',
+    'https://lost-and-found-b77udru8o-kapilbohriwals-projects.vercel.app'
   ],
-  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
+
+// ✅ VERY IMPORTANT (fixes your error)
+app.options('*', cors());
+
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
