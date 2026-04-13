@@ -40,11 +40,16 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve frontend for non-API routes
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
-  }
+
+app.get('/', (req, res) => {
+  res.send('API is running 🚀');
 });
+
+// app.get('*', (req, res) => {
+//   if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+//     res.sendFile(path.join(__dirname, '../frontend/index.html'));
+//   }
+// });
 
 // ── Error Handler ──────────────────────────────────────────
 app.use(errorHandler);
